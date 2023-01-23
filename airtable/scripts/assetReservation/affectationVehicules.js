@@ -105,8 +105,7 @@ if (availableAssets.length >0) {
                     [BaseSpecificNames.assetField]: [{id: selectedAsset.id}],
                     [BaseSpecificNames.personField]: [{id: person.id}],
                     [BaseSpecificNames.startField]: startDateRaw,
-                    [BaseSpecificNames.endField]: endDateRaw,
-                    [BaseSpecificNames.posteField]: {name: poste}
+                    [BaseSpecificNames.endField]: endDateRaw
                 })
             }
             output.markdown(`*Votre affectation a été prise en compte.*`)
