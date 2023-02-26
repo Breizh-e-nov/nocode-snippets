@@ -1,15 +1,15 @@
 const BaseSpecificNames = {
     // Reservations Table
-    reservationsTable: "Affectations personnel", // name of the [RESERVATIONS] table
+    reservationsTable: "Affectation_personnel", // name of the [RESERVATIONS] table
     assetField: "Personnel", // name of the link-type field connecting to the [ASSETS] table
-    startField: "Heure début",
-    endField: "Heure fin",
+    startField: "Heure_début",
+    endField: "Heure_fin",
     personField: "Prestation", // name of the link-type field connection to the [PEOPLE] table
     posteField : "Poste",
 
     // Assets Table
     assetsTable: "Personnel", // name of the [ASSETS] table
-    assetName: "Id", // name of the primary field in the [ASSETS] table
+    assetName: "Id_personnel", // name of the primary field in the [ASSETS] table
 
     // People Table
     peopleTable: "Prestations", // name of the [PEOPLE] table
@@ -25,12 +25,12 @@ const peopleTable = base.getTable(BaseSpecificNames.peopleTable);
 
 let person = await input.recordAsync("Affecter un(e) " + BaseSpecificNames.assetField + " à :", peopleTable, {shouldAllowCreatingRecord: true});
 
-const startDate = person.getCellValueAsString("Heure prêt sur place");
-const endDate = person.getCellValueAsString("Heure de fin");
+const startDate = person.getCellValueAsString("Heure_prêt_sur_place");
+const endDate = person.getCellValueAsString("Heure_de_fin");
 output.markdown(`> Cet événement se déroule de ${startDate} à ${endDate}`);
 
-const startDateRaw = person.getCellValue("Heure prêt sur place");
-const endDateRaw = person.getCellValue("Heure de fin");
+const startDateRaw = person.getCellValue("Heure_prêt_sur_place");
+const endDateRaw = person.getCellValue("Heure_de_fin");
 
 const reservationsTable = base.getTable(BaseSpecificNames.reservationsTable);
 
@@ -82,10 +82,10 @@ if (availableAssets.length >0) {
     
     if (selectedAsset) {
 
-        const postesPossibles = selectedAsset.getCellValue("Postes possibles").map(item => item.name);
+        const Métier = selectedAsset.getCellValue("Métier").map(item => item.name);
 
         let poste;
-        let selectedPoste = await input.buttonsAsync('Quel poste ?', postesPossibles);
+        let selectedPoste = await input.buttonsAsync('Quel poste ?', Métier);
         if (selectedPoste) {
             poste = selectedPoste;
         } else {
@@ -103,23 +103,13 @@ if (availableAssets.length >0) {
         let confirmed = await input.buttonsAsync('',[{label: 'Confirmer affectation', value: 'true', variant: 'primary'}]);
 
         if (confirmed) {
-            if (matchingReservationFound) {
-                await reservationsTable.updateRecordAsync(matchingReservationFound.id, {
-                    [BaseSpecificNames.assetField]: [
-                        ...matchingReservationFound.getCellValue(BaseSpecificNames.assetField),
-                        { id: selectedAsset.id }
-                    ]
-                })
-            }
-            else {
-                await reservationsTable.createRecordAsync({
-                    [BaseSpecificNames.assetField]: [{id: selectedAsset.id}],
-                    [BaseSpecificNames.personField]: [{id: person.id}],
-                    [BaseSpecificNames.startField]: startDateRaw,
-                    [BaseSpecificNames.endField]: endDateRaw,
-                    [BaseSpecificNames.posteField]: {name: poste}
-                })
-            }
+            await reservationsTable.createRecordAsync({
+                [BaseSpecificNames.assetField]: [{id: selectedAsset.id}],
+                [BaseSpecificNames.personField]: [{id: person.id}],
+                [BaseSpecificNames.startField]: startDateRaw,
+                [BaseSpecificNames.endField]: endDateRaw,
+                [BaseSpecificNames.posteField]: {name: poste}
+            });
             output.markdown(`*Votre affectation a été prise en compte.*`)
         }
     } else {
